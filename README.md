@@ -40,14 +40,12 @@ Ce mode active le live-reloading pour le frontend et le backend, ce qui permet d
 
 Ce mode est optimisé pour le déploiement. Il construit des images légères et configure les services pour être plus robustes.
 
-1.  Assurez-vous d'avoir un fichier `.env` configuré pour la production (vous pouvez vous baser sur `.env.production.example`).
-
-2.  Pour lancer l'application en mode production :
+1.  Pour lancer l'application en mode production :
     ```bash
     docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
     ```
 
-3.  Accédez à l'application :
+2.  Accédez à l'application :
     - **Frontend (Nginx)** : [http://localhost](http://localhost)
 
 ## Tableau des services
