@@ -14,20 +14,6 @@ Ce projet est une application web de simulation de vie, construite avec une arch
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
-## Démarrage rapide
-
-1.  Clonez le dépôt :
-    ```bash
-    git clone https://github.com/civilisation-autonome/civilisation-autonome.git
-    cd civilisation-autonome
-    ```
-
-2.  Copiez le fichier d'environnement de développement :
-    ```bash
-    cp .env.development.example .env
-    ```
-    Ce fichier contient les configurations par défaut pour l'environnement de développement.
-
 ## Lancer l'application avec Docker
 
 Le projet utilise des fichiers Docker Compose pour gérer les environnements de développement et de production.
