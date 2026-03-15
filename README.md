@@ -1,141 +1,89 @@
 # Simulation de vie
 
-Architecture du projet :
+Ce projet est une application web de simulation de vie, construite avec une architecture découplée frontend et backend.
 
-```
-Docker Compose
-├── PostgreSQL   persistance (joueurs, scores, historique)
-├── Redis        état temps réel, positions, rooms
-├── Keycloak     auth (OAuth2 / OIDC)
-├── app-backend  Spring Boot + Dominion ECS
-└── app-frontend Nginx + build React/Phaser/Vite/Zustand
-```
+## Architecture
 
-## Environnements (dev vs prod)
+- **Backend** : API REST et WebSocket avec Spring Boot.
+- **Frontend** : Application React (avec Vite) et Phaser pour le rendu du jeu.
+- **Services** : PostgreSQL pour la base de données, Redis pour le cache et les états temps réel, Keycloak pour l'authentification.
+- **Déploiement** : L'ensemble des services est orchestré avec Docker Compose.
 
-- **Dev / local** : utilise `.env` dérivé de `.env.development.example` (valeurs pour travailler en local ou Docker en dev).
-- **Prod / déploiement** : utilise des variables dérivées de `.env.production.example` (à définir sur le serveur ou l’orchestrateur, sans committer de vrais secrets).
+## Prérequis
 
-En local, après avoir copié le bon fichier en `.env`, Compose lira automatiquement `.env` au lancement.
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
-**Compose dev vs prod (même Dockerfiles de base) :**
+## Démarrage rapide
 
-| Fichier | Rôle |
-|--------|------|
-| `docker-compose.yml` | Base commune (tous les services). |
-| `docker-compose.dev.yml` | Override **dev** : live reload (backend + frontend), profiler JFR, profil Spring `dev`, Actuator, SQL en log. |
-| `docker-compose.prod.yml` | Override **prod** : `restart: unless-stopped`, profil Spring `prod`, limites mémoire, Keycloak en `start`. |
+1.  Clonez le dépôt :
+    ```bash
+    git clone https://github.com/civilisation-autonome/civilisation-autonome.git
+    cd civilisation-autonome
+    ```
 
-- **Un seul jeu de Dockerfiles** (front + back) : le backend a un stage **`dev`** en plus du stage par défaut (JRE). En dev on build avec `target: dev` pour avoir le JDK dans le conteneur (profiler, debug). En prod on utilise le stage par défaut (JRE, plus léger).
+2.  Copiez le fichier d'environnement de développement :
+    ```bash
+    cp .env.development.example .env
+    ```
+    Ce fichier contient les configurations par défaut pour l'environnement de développement.
 
-1. Copier les variables d’environnement (dev) :
-   ```bash
-   cp .env.development.example .env
-   ```
+## Lancer l'application avec Docker
 
-2. Lancer la stack :
-   - **Dev** : `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`
-   - **Prod** (ex. sur un VPS) : `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build`
-   - **Sans override** (base seule) : `docker compose up -d --build`
+Le projet utilise des fichiers Docker Compose pour gérer les environnements de développement et de production.
 
-3. Accès au site et aux services :
+### Mode Développement
 
-| Mode | Commande Compose | URL du site |
-|------|------------------|-------------|
-| **Dev** (live reload) | `-f docker-compose.yml -f docker-compose.dev.yml` | **http://localhost:5173** (Vite) |
-| **Base / Prod** | `up -d` sans override, ou avec `docker-compose.prod.yml` | **http://localhost** (port 80, Nginx) |
+Ce mode active le live-reloading pour le frontend et le backend, ce qui permet de voir les changements sans avoir à redémarrer manuellement les conteneurs.
 
-Autres URLs (tous modes) :
-- Backend : http://localhost:8080 (ex. `/health`, `/actuator/health`)
-- Keycloak : http://localhost:8180 (admin ; identifiants dans `.env` : `KEYCLOAK_ADMIN` / `KEYCLOAK_ADMIN_PASSWORD`)
-- PostgreSQL : `localhost:5432`, Redis : `localhost:6379`
+1.  Pour lancer l'application en mode développement :
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d
+    ```
 
-## Développement local
+2.  Accédez aux services :
+    - **Frontend (Vite)** : [http://localhost:5173](http://localhost:5173)
+    - **Backend API** : [http://localhost:8080](http://localhost:8080)
+    - **Keycloak (Admin)**: [http://localhost:8180](http://localhost:8180)
 
-### Backend (Spring Boot)
+**Live-Reload :**
+- **Frontend** : Toute modification dans le répertoire `app-frontend/src` est immédiatement visible dans votre navigateur.
+- **Backend** : Après une modification dans `app-backend/src`, compilez les classes avec `mvn compile` (ou `mvn package`) dans le répertoire `app-backend`. Spring DevTools redémarrera automatiquement l'application.
 
-- Prérequis : JDK 21, Maven, PostgreSQL et Redis en local (ou via `docker compose up postgres redis -d`).
-- Depuis `app-backend` :
-  ```bash
-  mvn spring-boot:run
-  ```
-  (Ou ajouter le Maven Wrapper et utiliser `./mvnw spring-boot:run`.)
+### Mode Production
 
-Structure standard Spring Boot (`app-backend/src/main/java/dev/simulation/`) :
-- **controller** : REST (ex. `HealthController`)
-- **service** : logique métier, `@Transactional` (ex. `JoueurService`)
-- **repository** : Spring Data JPA, `JpaRepository` (ex. `JoueurRepository`, `ScoreRepository`)
-- **entity** : entités JPA
-- **config** : configuration (CORS, WebSocket, etc.)
-- **websocket** : handler WebSocket
-- **ecs** : monde Dominion ECS (stub pour l’instant)
+Ce mode est optimisé pour le déploiement. Il construit des images légères et configure les services pour être plus robustes.
 
-### Frontend (Vite + React + Phaser + Zustand)
+1.  Assurez-vous d'avoir un fichier `.env` configuré pour la production (vous pouvez vous baser sur `.env.production.example`).
 
-- Depuis `app-frontend` :
-  ```bash
-  npm install
-  npm run dev
-  ```
-  Le proxy Vite redirige `/api` vers le backend (port 8080) et `/ws` en WebSocket.
+2.  Pour lancer l'application en mode production :
+    ```bash
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+    ```
 
-Structure standard React / Vite (`app-frontend/src/`) :
-- **components/** : composants React (ex. `GameView`)
-- **hooks/** : hooks personnalisés (ex. `useWebSocket`)
-- **utils/** : fonctions pures, helpers (ex. `getWebSocketUrl`)
-- **store/** : état global Zustand (ex. `appStore`)
-- **App.tsx**, **main.tsx** : point d’entrée
-- Alias d’import **`@/`** → `src/` (ex. `@/components/GameView`)
+3.  Accédez à l'application :
+    - **Frontend (Nginx)** : [http://localhost](http://localhost)
 
-Pour débugger le front : installer l’extension **React DevTools** dans le navigateur, puis ouvrir les outils développeur (F12) pour accéder aux onglets **Components** et **Profiler**.
+## Tableau des services
 
-### WebSocket
+| Service       | Port Local (défaut) | Description                                       |
+|---------------|---------------------|---------------------------------------------------|
+| `app-frontend`| `80` (prod), `5173` (dev) | Interface utilisateur (React/Phaser)              |
+| `app-backend` | `8080`              | API et logique métier (Spring Boot)             |
+| `postgres`    | `5432`              | Base de données relationnelle                   |
+| `redis`       | `6379`              | Cache et messagerie en temps réel               |
+| `keycloak`    | `8180`              | Gestion des identités et des accès (OAuth2/OIDC) |
 
-- **Backend** : endpoint `ws://.../ws/game` (Spring WebSocket), handler dans `app-backend/.../websocket/GameWebSocketHandler` (broadcast, à brancher sur l’ECS).
-- **Frontend** : `useWebSocket()` (hook dans `src/hooks/useWebSocket.ts`) pour se connecter, envoyer et recevoir des messages. En prod, Nginx proxy `/ws/` vers le backend.
+## Qualité du code
 
-### Keycloak (auth)
+Des linters et formateurs sont configurés pour maintenir une base de code propre.
 
-- Service Keycloak 24 en mode `start-dev` (adapté au dev local).
-- Console d’admin : http://localhost:8180 (créer un realm, des clients pour le front et le backend).
-- L’intégration Spring Security OAuth2 (validation JWT) et le login côté front (Keycloak JS ou redirect) se feront au moment où tu protègeras les endpoints et le WebSocket.
+- **Backend** (depuis `app-backend`):
+  - `mvn validate` : Vérifie le style (Checkstyle & Spotless).
+  - `mvn spotless:apply` : Formate le code.
 
-### Live reload (mode dev Docker)
+- **Frontend** (depuis `app-frontend`):
+  - `npm run lint` : Vérifie le code avec ESLint.
+  - `npm run format` : Formate le code avec Prettier.
 
-Avec `docker-compose.dev.yml`, le site est servi par Vite : **http://localhost:5173**.
-
-- **Backend** : le volume `./app-backend/target/classes` est monté. Après une modif, lance `mvn compile` (ou `mvn package`) dans `app-backend` ; Spring DevTools redémarre le conteneur. Une fois avant la première utilisation : `mvn package` dans `app-backend` pour générer le JAR (PropertiesLauncher) et `target/classes`.
-- **Frontend** : le code est monté, le serveur Vite tourne dans le conteneur ; la modification d’un fichier déclenche le HMR (hot reload) automatiquement.
-
-### Profil dev et profiler (backend)
-
-- Avec `docker-compose.dev.yml`, le backend utilise le profil Spring `dev` et l’image **dev** (JDK).
-- `application-dev.yml` : SQL en log, Actuator (`/actuator/health`, `/actuator/metrics`), niveau DEBUG pour `dev.simulation`.
-- **Java Flight Recorder (JFR)** est activé par défaut en dev : enregistrement continu dans le conteneur (`/tmp/recording.jfr`, max 100 Mo, 1 jour). Pour analyser : `docker cp simulation-backend:/tmp/recording.jfr .` puis ouvrir avec JDK Mission Control, IntelliJ (Run → Open Flight Recorder Snapshot) ou `jfr view recording.jfr`.
-
-## Base saine dev / prod
-
-- **`.dockerignore`** (backend + frontend) : exclut `target/`, `node_modules/`, `.git`, etc. pour des builds plus rapides et un contexte propre.
-- **Backend** : conteneur tourne en **utilisateur non-root** (`appuser`) ; **profil `prod`** (`application-prod.yml`) : pas de SQL en log, Actuator limité à `/actuator/health`, pas de détails santé exposés.
-- **Actuator** : en base seul `health` est exposé ; le profil `dev` ouvre `info` et `metrics`.
-- **Nginx** : headers de sécurité (X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy) ; cache long (1 an) pour les assets statiques hashés.
-- **Compose** : healthcheck sur le backend (`/actuator/health`) ; le frontend ne démarre qu’une fois le backend healthy.
-- **Prod** : `docker-compose.prod.yml` force le profil Spring `prod`, ajoute des **limites mémoire** (deploy.resources) pour éviter qu’un service sature la machine — prises en compte en mode Swarm ; en mode `docker compose` classique, seul le reste (restart, profil) s’applique.
-
-## Lint et bonnes pratiques
-
-À chaque **push / PR**, la GitHub Action (`.github/workflows/lint.yml`) lance :
-
-- **backend-lint** : `mvn validate` (Checkstyle + Spotless) uniquement.
-- **frontend-lint** : `npm run lint` (ESLint), `npm run format:check` (Prettier), puis `npm run build`.
-
-Pour formater et vérifier en local avant de pousser :
-
-- **Backend** (dans `app-backend`) :
-  - Vérifier le style : `mvn validate`
-  - Formater le code : `mvn spotless:apply`
-- **Frontend** (dans `app-frontend`) :
-  - Linter : `npm run lint` / `npm run lint:fix`
-  - Format : `npm run format:check` / `npm run format`
-
-Conseil : générer un `package-lock.json` côté frontend (`npm install` puis commit du lock) pour des builds CI reproductibles.
+Une GitHub Action valide le code à chaque `push`.
