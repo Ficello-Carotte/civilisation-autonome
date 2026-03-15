@@ -1,0 +1,12 @@
+dev/simulation/controller/HealthController.class
+dev/simulation/entity/Score.class
+dev/simulation/websocket/GameWebSocketHandler.class
+dev/simulation/repository/JoueurRepository.class
+dev/simulation/service/JoueurService.class
+dev/simulation/ecs/SimulationWorldConfig.class
+dev/simulation/ecs/SimulationWorld.class
+dev/simulation/entity/Joueur.class
+dev/simulation/config/WebConfig.class
+dev/simulation/repository/ScoreRepository.class
+dev/simulation/config/WebSocketConfig.class
+dev/simulation/SimulationDeVieApplication.class

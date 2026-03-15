@@ -1,0 +1,12 @@
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/entity/Joueur.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/ecs/SimulationWorld.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/ecs/SimulationWorldConfig.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/repository/JoueurRepository.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/controller/HealthController.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/config/WebSocketConfig.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/repository/ScoreRepository.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/SimulationDeVieApplication.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/websocket/GameWebSocketHandler.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/entity/Score.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/service/JoueurService.java
+/home/florian/GitHub/simulation-de-vie/app-backend/src/main/java/dev/simulation/config/WebConfig.java

@@ -1,0 +1,22 @@
+# Profil dev : utile en local ou avec docker-compose.dev.yml
+spring:
+  jpa:
+    show-sql: true
+  devtools:
+    restart:
+      enabled: true
+
+# Actuator pour health, metrics, etc. (désactiver ou sécuriser en prod)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    dev.simulation: DEBUG
+    org.hibernate.SQL: DEBUG

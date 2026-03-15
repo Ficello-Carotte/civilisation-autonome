@@ -1,0 +1,21 @@
+# Profil prod : pas de réglages dev, actuator minimal
+spring:
+  jpa:
+    show-sql: false
+  devtools:
+    restart:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    dev.simulation: INFO
+    root: WARN

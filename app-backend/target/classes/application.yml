@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: simulation-de-vie-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/simulation}
+    username: ${SPRING_DATASOURCE_USERNAME:simulation}
+    password: ${SPRING_DATASOURCE_PASSWORD:simulation}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: public
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+server:
+  port: 8080
+
+# Actuator : par défaut seul health (prod-safe). Le profil dev ouvre info, metrics.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: when-authorized

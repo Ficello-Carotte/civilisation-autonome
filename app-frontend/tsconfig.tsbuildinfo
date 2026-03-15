@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/GameView.tsx","./src/hooks/useWebSocket.ts","./src/store/appStore.ts","./src/utils/getWebSocketUrl.ts"],"version":"5.9.3"}
